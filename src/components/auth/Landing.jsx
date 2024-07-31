@@ -146,7 +146,7 @@ export default function Landing(){
                                 <h1>Contact us</h1>
                                 <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ut, blanditiis?</p>
                             </div>                            
-                            <h1>Email:<span>serviceharbour@gmail.com</span></h1>
+                            
                             <h1>Phonenumber:<span>+1 8569740231</span></h1>
                         </div>
                         <div className="conatactfields">
