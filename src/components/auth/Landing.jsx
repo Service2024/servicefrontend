@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import '../../assets/css/main.css'
+import { useNavigate } from "react-router-dom";
 import mainimage from '../../assets/images/section1img.png'
 import aboutimg from '../../assets/images/aboutus.png'
 import car from '../../assets/images/car.png'
@@ -16,6 +17,7 @@ import contactus from '../../assets/images/contactus.png'
 import { FaBarsStaggered } from "react-icons/fa6";
 
 export default function Landing(){
+    const navigate=useNavigate()
     const[openNav,setOpenNav]=useState(false)
     return(
         <>
@@ -43,7 +45,7 @@ export default function Landing(){
                     <div className="content">
                         <h1>Service Harbour</h1>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis perferendis reprehenderit quaerat asperiores recusandae sequi soluta tenetur accusamus delectus, rem eveniet. Nisi architecto commodi iure, sed similique ab dolor ullam eveniet quia expedita repellendus at dolorum sequi! Rem, cum accusantium nulla, eum magni quae, perspiciatis consectetur distinctio tenetur non dolor.</p>
-                        <button>Join now</button>
+                        <button onClick={()=>navigate('/signup')} className="srvcbtn">Join now</button>
                     </div>
                     <div className="mainImage">
                         <img src={mainimage} alt="No image" />

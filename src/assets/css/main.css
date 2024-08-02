@@ -122,7 +122,7 @@ body {
     letter-spacing: 1px;
 }
 
-.mainContent .content button {
+.srvcbtn {
     width: 20%;
     height: 35px;
     font-family: "Edu AU VIC WA NT Hand", cursive;
@@ -136,7 +136,7 @@ body {
     cursor: pointer;
 }
 
-.mainContent .content button:hover {
+.srvcbtn:hover {
     background-color: white;
     color: black;
     letter-spacing: 1px;
@@ -223,8 +223,8 @@ body {
     padding: 10px;
 }
 
-.servicesSection .serviceContent .serviceCards .card .cardcontent p{
-    width:100%;
+.servicesSection .serviceContent .serviceCards .card .cardcontent p {
+    width: 100%;
 }
 
 .servicesSection .serviceContent .serviceCards .card img {
@@ -232,28 +232,28 @@ body {
     padding: 30px;
 }
 
-.career{
+.career {
     width: 100%;
     border: 2px solid black;
-    height:90vh;
+    height: 90vh;
     text-align: center;
     margin-top: 110px;
 }
 
-.contactus{
+.contactus {
     width: 100%;
     border: 2px solid black;
-    height:auto;
+    height: auto;
     padding: 35px;
     margin-top: 110px;
 }
 
-.contactus .contactDetails{
-    width:100%;
+.contactus .contactDetails {
+    width: 100%;
     height: auto;
 }
 
-.contactus .contactDetails .contactform{
+.contactus .contactDetails .contactform {
     width: 100%;
     height: auto;
     border: 2px solid black;
@@ -261,12 +261,82 @@ body {
     justify-content: space-around;
 }
 
-.contactus .contactDetails .contactform .contactformDetails{
+.contactus .contactDetails .contactform .contactformDetails {
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
     width: 50%;
 }
 
+.formConcepts {
+    width: 100%;
+    border: 5px solid black;
+    min-height: 100vh;
+    position: relative;
+}
+
+.formBox {
+    width: 50%;
+    border: 2px solid black;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.formBox form {
+    width: 100%;
+    height: auto;
+    padding: 35px;
+    margin-left: 200px;
+}
+
+.formBox form h1 {
+    margin-bottom: 15px;
+}
+
+.inputDetails {
+    position: relative;
+}
+
+.inputDetails input {
+    height: 40px;
+    width: 50%;
+    margin-bottom: 15px;
+    outline: none;
+    border: 2px solid rgb(7, 7, 7);
+}
+
+.inputDetails input:focus {
+    border: 2px solid rgb(7, 7, 7);
+}
+
+.inputDetails label {
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    font-size: 15px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: 0.5s ease-in-out;
+}
+
+.inputDetails input:focus~label,
+.inputDetails input:valid~label {
+    top: 0;
+    left: 10%;
+    background-color: white;
+}
+
+.otherlinks {
+    margin-top: 25px;
+}
+
+.formBox .otherlinks span a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
 
 @media screen and (max-width:750px) {
     .navsection nav {
@@ -329,9 +399,11 @@ body {
     p {
         text-align: center;
     }
-    .servicesSection{
+
+    .servicesSection {
         padding: 20px;
     }
+
     .servicesSection .serviceContent .serviceCards {
         display: flex;
         flex-wrap: nowrap;
@@ -343,5 +415,64 @@ body {
     .servicesSection .serviceContent .serviceCards .card {
         border: 2px solid black;
         min-width: 100%;
+    }
+
+    .formBox {
+        width: 100%;
+        border: 2px solid black;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .formBox form {
+        width: 100%;
+        height: auto;
+        padding: 30px;
+        margin-left: 0;
+    }
+
+    .inputDetails input {
+        height: 40px;
+        width: 100%;
+        margin-bottom: 5px;
+        outline: none;
+        border: 2px solid black;
+    }
+
+    .inputDetails label {
+        top: 50%;
+        left: 20%;
+        transform: translate(-50%, -50%);
+        transition: 0.5s ease-in-out;
+    }
+
+    .formBox form {
+        width: 100%;
+        padding: 0;
+        margin-left: 0;
+    }
+
+    .inputDetails input {
+        height: 40px;
+        width: 100%;
+        margin-top: 15px;
+        outline: none;
+        margin-bottom: 15px;
+    }
+
+    .Signupbtns {
+        margin-top: 15px;
+    }
+
+    .inputDetails input:focus~label,
+    .inputDetails input:valid~label {
+        top:10px;
+        left:80px;
+        background-color: white;
+        color: black;
+        font-weight: bold;
     }
 }
