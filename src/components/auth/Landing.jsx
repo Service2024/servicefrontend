@@ -12,8 +12,6 @@ import pet from '../../assets/images/pet.png'
 import tutor from '../../assets/images/tutor.png'
 import fitness from '../../assets/images/fitness.png'
 import contactus from '../../assets/images/contactus.png'
-
-
 import { FaBarsStaggered } from "react-icons/fa6";
 
 export default function Landing(){
@@ -21,6 +19,7 @@ export default function Landing(){
     const[openNav,setOpenNav]=useState(false)
     return(
         <>
+            <div>
             <section className="firstSection">
                 <div className="navsection">
                     <nav>
@@ -174,6 +173,7 @@ export default function Landing(){
                     </div>
                 </div>
             </section>
+            </div>
         </>
     )
 }
