@@ -49,9 +49,7 @@ export default function Homepage() {
                     </div>
                     <div className="homepageContent">
                         <div className={toogle===1?"homeContents active-content":"homeContents"}>
-                           <Login/>
-                           <Login/>
-
+                           <h1>Homepage</h1>
                         </div>
                         <div className={toogle===2?"homeContents active-content":"homeContents"}>
                             <h1>Service</h1>
