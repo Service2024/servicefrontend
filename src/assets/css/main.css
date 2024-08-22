@@ -275,7 +275,7 @@ body {
 }
 
 .formBox {
-    width: 50%;
+    width: 30%;
     border: 2px solid black;
     height: auto;
     position: absolute;
@@ -288,7 +288,8 @@ body {
     width: 100%;
     height: auto;
     padding: 35px;
-    margin-left: 200px;
+    position: relative;
+    
 }
 
 .formBox form h1 {
@@ -301,7 +302,7 @@ body {
 
 .inputDetails input {
     height: 40px;
-    width: 50%;
+    width: 100%;
     margin-bottom: 15px;
     outline: none;
     border: 2px solid rgb(7, 7, 7);
@@ -324,7 +325,7 @@ body {
 .inputDetails input:focus~label,
 .inputDetails input:valid~label {
     top: 0;
-    left: 10%;
+    left: 20%;
     background-color: white;
 }
 
@@ -338,7 +339,7 @@ body {
     font-weight: bold;
 }
 
-@media screen and (max-width:750px) {
+@media screen and (max-width:934px) {
     .navsection nav {
         background-color: black;
         color: white;
@@ -447,12 +448,6 @@ body {
         left: 20%;
         transform: translate(-50%, -50%);
         transition: 0.5s ease-in-out;
-    }
-
-    .formBox form {
-        width: 100%;
-        padding: 0;
-        margin-left: 0;
     }
 
     .inputDetails input {

@@ -6,7 +6,8 @@ import Login from './components/auth/Login'
 import Forgotpassword from './components/auth/Forgotpassword'
 import Updatepassword from './components/auth/Updatepassword'
 import Homepage from './components/userpages/Homepage'
-
+import Profile from './components/userpages/Profile'
+import GetSubDetails from './components/userpages/GetSubDetails'
 function App() {
   return (
     <>
@@ -18,6 +19,8 @@ function App() {
             <Route exact path="/forgotpassword" element={<Forgotpassword/>}/>
             <Route exact path="/upassword" element={<Updatepassword/>}/>
             <Route exact path="/home" element={<Homepage/>}/>
+            <Route exact path="/profile" element={<Profile/>}/>
+            <Route exact path="/getallSub" element={<GetSubDetails/>}/>
           </Routes>
         </Router>
     </>
