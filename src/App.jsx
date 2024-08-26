@@ -8,6 +8,7 @@ import Updatepassword from './components/auth/Updatepassword'
 import Homepage from './components/userpages/Homepage'
 import Profile from './components/userpages/Profile'
 import GetSubDetails from './components/userpages/GetSubDetails'
+import Workerorder from './components/workerpages/Workerorder'
 function App() {
   return (
     <>
@@ -21,6 +22,7 @@ function App() {
             <Route exact path="/home" element={<Homepage/>}/>
             <Route exact path="/profile" element={<Profile/>}/>
             <Route exact path="/getallSub" element={<GetSubDetails/>}/>
+            <Route exact path="/worker" element={<Workerorder/>}/>
           </Routes>
         </Router>
     </>

@@ -21,7 +21,7 @@ export default function Homepage() {
 
     if (!token) {
         navigate('/login');
-        return null; // Return null to prevent rendering if no token is found
+        return null;
     }
 
     const decodeusertype = jwtDecode(token);
@@ -53,9 +53,6 @@ export default function Homepage() {
                         </div>
                         <div className={toogle === 2 ? "bars activetabs" : "bars"} onClick={() => { toogleBtn(2) }}>
                             <FaServicestack /> Service
-                        </div>
-                        <div className={toogle === 3 ? "bars activetabs" : "bars"} onClick={() => { toogleBtn(3) }}>
-                            <FaRegMessage /> Message
                         </div>
                         {usertype == 0 && (
                         <div className={toogle === 5 ? "bars activetabs" : "bars"} onClick={() => { toogleBtn(5) }}>
@@ -92,10 +89,6 @@ export default function Homepage() {
                         <div className={toogle === 2 ? "homeContents active-content" : "homeContents"}>
                             <UserServicepage />
                         </div>
-                        <div className={toogle === 3 ? "homeContents active-content" : "homeContents"}>
-                            <h1>Message</h1>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur praesentium reiciendis tempora consequuntur qui voluptatibus non quibusdam facere, eveniet natus rem sapiente illo repudiandae. Tenetur quasi impedit soluta quia ipsa?</p>
-                        </div>
                         {usertype == 1 && (
                             <div className={toogle === 4 ? "homeContents active-content" : "homeContents"}>
                                 <Workerorder />
@@ -103,8 +96,6 @@ export default function Homepage() {
                         )}
                         {usertype == 0 && (
                             <div className={toogle === 5 ? "homeContents active-content" : "homeContents"}>
-                                <h1>Subscription</h1>
-                                <p>By default $250</p>
                                 <Subscription/>
                             </div>
                         )}

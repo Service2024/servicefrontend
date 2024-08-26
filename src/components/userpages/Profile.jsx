@@ -1,290 +1,416 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Profile() {
-  const [data, setData] = useState({})
-  const [modal, setmodal] = useState(false)
-  const modalBox = () => {
-    setmodal(!modal)
-  }
-  const [promodal, serPromodal] = useState(false)
-
-  const profileModal = () => {
-    serPromodal(!promodal)
-  }
-
-  const getProfile = async () => {
-    const token = localStorage.getItem('token')
-    const response = await axios.get('http://localhost:6060/profile', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    setData(response.data.message)
-  }
-
+  const [data, setData] = useState({});
+  const [modal, setModal] = useState(false);
+  const [promodal, setPromodal] = useState(false);
   const [proupdate, setProupdate] = useState({
     firstname: '',
     lastname: '',
     email: '',
     phonenumber: ''
-  })
-
-  const editprofileHandleChange = (e) => {
-    const { name, value } = e.target;
-    setProupdate({ ...proupdate, [name]: value })
-  }
-
-  const updateProfile = async (e) => {
-    e.preventDefault()
-    const token = localStorage.getItem('token')
-    const updProfile = await axios.put('http://localhost:6060/profileupdate', proupdate, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    if (updProfile.status == 200) {
-      alert('update')
-      serPromodal(false)
-    }
-  }
-
-  const editProfileData = (profileData) => {
-    setProupdate({
-      id: profileData.id,
-      firstname: profileData.firstname,
-      lastname: profileData.lastname,
-      email: profileData.email,
-      phonenumber: profileData.phonenumber
-    });
-    serPromodal(true)
-  }
-
-  const [addData, setaddData] = useState({
+  });
+  const [addData, setAddData] = useState({
     address: '',
     city: '',
     state: '',
     postal_code: ''
-  })
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setaddData((prevData) => ({ ...prevData, [name]: value }))
-  }
-
-  const addAddress = async (e) => {
-    e.preventDefault()
-    const token = localStorage.getItem('token')
-    const addresponse = await axios.post('http://localhost:6060/addaddress', addData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    if (addresponse.status == 200) {
-      getAdressFun()
-      setmodal(false)
-      console.log("Sss", addData)
-      alert('success')
-    } else {
-      alert('remove')
-    }
-  }
-
-  const [getAddress, getAllAddress] = useState([])
-
-  const getAdressFun = async () => {
-    const token = localStorage.getItem('token')
-    const res = await axios.get('http://localhost:6060/getaddress', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    getAllAddress(res.data.data)
-  }
-
+  });
+  const [getAddress, setGetAddress] = useState([]);
   const [editData, setEditData] = useState({
     address: '',
     city: '',
     state: '',
     postal_code: ''
-  })
+  });
+  const [file, setFile] = useState(null);
+  const [images, setImages] = useState([]);
 
-  const editOnchange = (e) => {
-    const { name, value } = e.target;
-    setEditData((editprevData) => ({ ...editprevData, [name]: value }))
-  }
+  useEffect(() => {
+    getProfile();
+    getAddressFun();
+    getImages();
+  }, []);
 
-  const editAddress = async (e) => {
-    e.preventDefault()
-    const token = localStorage.getItem('token')
-    const resp = await axios.put(`http://localhost:6060/updateaddress/${editData.id}`, editData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    if (resp.status === 200) {
-      alert("success");
-      getAdressFun()
+  const getProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:6060/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setData(response.data.message);
+      // Debugging: Check if data is fetched correctly
+      console.log('Profile data:', response.data.message);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     }
-  }
+  };
 
-  const editFunData = (address) => {
-    setEditData({
-      id: address.id,
-      address: address.address,
-      city: address.city,
-      state: address.state,
-      postal_code: address.postal_code
-    });
-    setmodal(true);
-  }
-
-  const addDelete = async (id, e) => {
-    e.preventDefault()
-    const token = localStorage.getItem('token')
-    const resp = await axios.delete(`http://localhost:6060/deletaddress/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+  const updateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const updProfile = await axios.put('http://localhost:6060/profileupdate', proupdate, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (updProfile.status === 200) {
+        alert('Profile updated');
+        setPromodal(false);
+        getProfile(); // Refresh profile data
       }
-    })
-    if (resp.status === 200) {
-      alert("success");
-      getAdressFun()
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
-  }
-
-  const [file, setFile] = useState(null)
-
-  const fileonChange = (e) => {
-    setFile(e.target.files[0])
-  }
+  };
 
   const handleProfileSubmit = async (e) => {
+    e.preventDefault();
     try {
-      e.preventDefault()
-      const token = localStorage.getItem('token')
-      const formdata = new FormData()
+      const token = localStorage.getItem('token');
+      const formdata = new FormData();
       formdata.append('file', file);
-
       const response = await axios.post('http://localhost:6060/profileImage', formdata, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
-      })
+      });
       if (response.status === 200) {
-        alert('success')
-        getImages()
+        alert('Profile image uploaded');
+        getImages();
       }
     } catch (error) {
       console.error('Error uploading profile image:', error);
     }
-  }
+  };
 
-  const [images, setimage] = useState([])
   const getImages = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token');
       const response = await axios.get('http://localhost:6060/getallimages', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      setimage(response.data.data)
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setImages(response.data.data);
     } catch (error) {
-      console.error('Error uploading profile image:', error);
+      console.error('Error fetching images:', error);
     }
-  }
-  useEffect(() => {
-    getProfile(),
-      getAdressFun(),
-      getImages()
-  }, [])
-  return (
-    <>
-      <div className="mainProfile">
-        <div className="profileDetails">
-          <h1>Profile</h1>
-          <div className="details">
-            <ul>
-              <li>Firstname:<span>{data.firstname}</span></li>
-              <li>Lastname:<span>{data.lastname}</span></li>
-              <li>Email:<span>{data.email}</span></li>
-              <li>Phone number:<span>{data.phonenumber}</span></li>
-              <li><button onClick={() => editProfileData(data)}>Edit</button></li>
-            </ul>
-          </div>
-          profile Images:
-          <div>
-            {images.length > 0 ? (
-              images.map((image) => (
-                <img
-                  key={image.id}
-                  src={`http://localhost:6060/uploads/profile/${image.profileImage}`}
-                  alt="Profile"
-                  style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '5px' }}
-                />
-              ))
-            ) : (
-              <p>No profileData</p>
-            )}
-          </div>
-          {images.length===0?(
-          <div>
-            <form onSubmit={handleProfileSubmit}>
-              <input type="file" onChange={fileonChange} />
-              <button>Upload</button>
-            </form>
-          </div>
-          ):(
-            <button>Edit</button>
-          )}
-          {promodal && (
-            <div>
-              <form onSubmit={updateProfile}>
-                <input type="text" name='firstname' value={proupdate.firstname} onChange={editprofileHandleChange} /><br />
-                <input type="text" name='lastname' value={proupdate.lastname} onChange={editprofileHandleChange} /><br />
-                <input type="text" name='email' value={proupdate.email} onChange={editprofileHandleChange} /><br />
-                <input type="text" name='phonenumber' value={proupdate.phonenumber} onChange={editprofileHandleChange} /><br />
-                <button>Submit</button>
-              </form>
-            </div>
-          )}
-          <form onSubmit={addAddress}>
-            <input type="text" placeholder='enter address' name='address' value={addData.address} onChange={handleChange} />
-            <input type="text" placeholder='enter city' name='city' value={addData.city} onChange={handleChange} />
-            <input type="text" placeholder='enter state' name='state' value={addData.state} onChange={handleChange} />
-            <input type="number" placeholder='enter postalcode' name='postal_code' value={addData.postal_code} onChange={handleChange} />
-            <button >Submit</button>
-          </form>
-        </div>
+  };
 
-        <h1>Address</h1>
-        <div>
-          {getAddress.map((address) => (
-            <ul key={address.id}>
-              <li>Address:<span>{address.address}</span></li>
-              <li>City:<span>{address.city}</span></li>
-              <li>State:<span>{address.state}</span></li>
-              <li>Postal code:<span>{address.postal_code}</span></li><br />
-              <button onClick={() => editFunData(address)}>Edit</button>
-              <button onClick={(e) => addDelete(address.id, e)}>Delete</button>
-            </ul>
-          ))}
+  const addAddress = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const addresponse = await axios.post('http://localhost:6060/addaddress', addData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (addresponse.status === 200) {
+        getAddressFun();
+        setModal(false);
+        alert('Address added');
+      }
+    } catch (error) {
+      console.error('Error adding address:', error);
+    }
+  };
+
+  const getAddressFun = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:6060/getaddress', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setGetAddress(res.data.data);
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+    }
+  };
+
+  const editAddress = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const resp = await axios.put(`http://localhost:6060/updateaddress/${editData.id}`, editData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (resp.status === 200) {
+        alert('Address updated');
+        getAddressFun();
+      }
+    } catch (error) {
+      console.error('Error updating address:', error);
+    }
+  };
+
+  const addDelete = async (id, e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const resp = await axios.delete(`http://localhost:6060/deletaddress/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (resp.status === 200) {
+        alert('Address deleted');
+        getAddressFun();
+      }
+    } catch (error) {
+      console.error('Error deleting address:', error);
+    }
+  };
+
+  const fileonChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const editProfileData = (profileData) => {
+    // Open modal and set form values for editing
+    setProupdate({
+      firstname: profileData.firstname || '',
+      lastname: profileData.lastname || '',
+      email: profileData.email || '',
+      phonenumber: profileData.phonenumber || ''
+    });
+    setPromodal(true);
+  };
+
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">Profile</h1>
+      <div className="row">
+        <div className="col-md-4">
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title">Profile Details</h5>
+              <ul className="list-unstyled">
+                <li><strong>Firstname:</strong> {data.firstname}</li>
+                <li><strong>Lastname:</strong> {data.lastname}</li>
+                <li><strong>Email:</strong> {data.email}</li>
+                <li><strong>Phone number:</strong> {data.phonenumber}</li>
+                <li><button className="btn btn-primary mt-2" onClick={() => editProfileData(data)}>Edit Profile</button></li>
+              </ul>
+            </div>
+          </div>
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title">Profile Images</h5>
+              <div className="mb-3">
+                {images.length > 0 ? (
+                  images.map((image) => (
+                    <img
+                      key={image.id}
+                      src={`http://localhost:6060/uploads/profile/${image.profileImage}`}
+                      alt="Profile"
+                      className="img-thumbnail"
+                      style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '5px' }}
+                    />
+                  ))
+                ) : (
+                  <p>No profile images</p>
+                )}
+              </div>
+              {images.length === 0 ? (
+                <form onSubmit={handleProfileSubmit}>
+                  <div className="mb-3">
+                    <input type="file" className="form-control" onChange={fileonChange} />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Upload</button>
+                </form>
+              ) : (
+                <button className="btn btn-secondary">Edit Images</button>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="col-md-8">
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title">Address</h5>
+              <form onSubmit={addAddress}>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter address"
+                    name="address"
+                    value={addData.address}
+                    onChange={(e) => setAddData({ ...addData, address: e.target.value })}
+                  />
+                </div>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter city"
+                    name="city"
+                    value={addData.city}
+                    onChange={(e) => setAddData({ ...addData, city: e.target.value })}
+                  />
+                </div>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter state"
+                    name="state"
+                    value={addData.state}
+                    onChange={(e) => setAddData({ ...addData, state: e.target.value })}
+                  />
+                </div>
+                <div className="mb-3">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="Enter postal code"
+                    name="postal_code"
+                    value={addData.postal_code}
+                    onChange={(e) => setAddData({ ...addData, postal_code: e.target.value })}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary">Add Address</button>
+              </form>
+              <hr />
+              {getAddress.length > 0 ? (
+                getAddress.map((address) => (
+                  <div key={address.id} className="mb-3">
+                    <ul className="list-unstyled">
+                      <li><strong>Address:</strong> {address.address}</li>
+                      <li><strong>City:</strong> {address.city}</li>
+                      <li><strong>State:</strong> {address.state}</li>
+                      <li><strong>Postal Code:</strong> {address.postal_code}</li>
+                      <li>
+                        <button className="btn btn-warning me-2" onClick={() => { setEditData(address); setModal(true); }}>Edit</button>
+                        <button className="btn btn-danger" onClick={(e) => addDelete(address.id, e)}>Delete</button>
+                      </li>
+                    </ul>
+                  </div>
+                ))
+              ) : (
+                <p>No addresses found</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      {modal && (
-        <div>
-          <form onSubmit={editAddress}>
-            <input type="text" name='address' value={editData.address} onChange={editOnchange} />
-            <input type="text" name='city' value={editData.city} onChange={editOnchange} />
-            <input type="text" name='state' value={editData.state} onChange={editOnchange} />
-            <input type="text" name='postal_code' value={editData.postal_code} onChange={editOnchange} />
-            <button>Submit</button>
-          </form>
+
+      {/* Edit Profile Modal */}
+      {promodal && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Profile</h5>
+                <button type="button" className="btn-close" onClick={() => setPromodal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={updateProfile}>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="firstname"
+                      value={proupdate.firstname}
+                      onChange={(e) => setProupdate({ ...proupdate, firstname: e.target.value })}
+                      placeholder="First Name"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="lastname"
+                      value={proupdate.lastname}
+                      onChange={(e) => setProupdate({ ...proupdate, lastname: e.target.value })}
+                      placeholder="Last Name"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      value={proupdate.email}
+                      onChange={(e) => setProupdate({ ...proupdate, email: e.target.value })}
+                      placeholder="Email"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="phonenumber"
+                      value={proupdate.phonenumber}
+                      onChange={(e) => setProupdate({ ...proupdate, phonenumber: e.target.value })}
+                      placeholder="Phone Number"
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Save changes</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </>
+
+      {/* Edit Address Modal */}
+      {modal && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Address</h5>
+                <button type="button" className="btn-close" onClick={() => setModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={editAddress}>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="address"
+                      value={editData.address}
+                      onChange={(e) => setEditData({ ...editData, address: e.target.value })}
+                      placeholder="Address"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="city"
+                      value={editData.city}
+                      onChange={(e) => setEditData({ ...editData, city: e.target.value })}
+                      placeholder="City"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="state"
+                      value={editData.state}
+                      onChange={(e) => setEditData({ ...editData, state: e.target.value })}
+                      placeholder="State"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="postal_code"
+                      value={editData.postal_code}
+                      onChange={(e) => setEditData({ ...editData, postal_code: e.target.value })}
+                      placeholder="Postal Code"
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Save changes</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

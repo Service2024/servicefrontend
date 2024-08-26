@@ -1,8 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 function Servicepage() {
-    const [addService, setaddService] = useState({
+    const [addService, setAddService] = useState({
         serviceName: '',
         minPrice: '',
         maxPrice: '',
@@ -10,188 +12,322 @@ function Servicepage() {
         aboutuserDescription: '',
         diffServices: '',
         qualification: ''
-    })
+    });
 
+    const [serData, setSerData] = useState([]);
+    const [modalType, setModalType] = useState(null); // 'add' or 'edit'
+    const [editsr, setEditService] = useState({
+        id: '',
+        serviceName: '',
+        minPrice: '',
+        maxPrice: '',
+        serviceDescription: '',
+        aboutuserDescription: '',
+        diffServices: '',
+        qualification: ''
+    });
+
+    // Function to handle input changes for add and edit forms
     const onChangeHandler = (e) => {
         const { name, value } = e.target;
-        setaddService((servicePrevState) => ({ ...servicePrevState, [name]: value }))
-    }
+        setAddService(prevState => ({ ...prevState, [name]: value }));
+    };
 
-    const addServiceFunction = async (e) => {
-        e.preventDefault()
-        const token = localStorage.getItem('token')
-        const serv = await axios.post('http://localhost:6060/addservice', addService, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        if (serv.status === 200) {
-            getServiceDetails()
-            deleteService()
-            alert('success')
-        }
-    }
-
-    const [serData, setserData] = useState([])
-
-    const getServiceDetails = async () => {
-        const token = localStorage.getItem('token')
-        const serv = await axios.get('http://localhost:6060/getservice', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        if (serv.status === 200) {
-            setserData(serv.data.message)
-        }
-    }
-
-    const [modal, setModal] = useState(false)
-    const modalBox = () => {
-        setModal(!modal)
-    }
-    const [editsr, setEditService] = useState({
-        serviceName: '',
-        minPrice: '',
-        maxPrice: '',
-        serviceDescription: '',
-        aboutuserDescription: '',
-        diffServices: '',
-        qualification: ''
-    })
-    const editonChange = (e) => {
+    const editOnChange = (e) => {
         const { name, value } = e.target;
-        setEditService((editServ) => ({ ...editServ, [name]: value }))
-    }
-    const serviceUpdate = (attr) => {
-        setEditService({
-            id: attr.id,
-            serviceName: attr.serviceName,
-            minPrice: attr.minPrice,
-            maxPrice: attr.maxPrice,
-            serviceDescription: attr.serviceDescription,
-            aboutuserDescription: attr.aboutuserDescription,
-            diffServices: attr.diffServices,
-            qualification: attr.qualification
-        });
-        setModal(true);
-    }
+        setEditService(prevState => ({ ...prevState, [name]: value }));
+    };
 
+    // Function to add a service
+    const addServiceFunction = async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.post('http://localhost:6060/addservice', addService, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                alert('Service added successfully');
+                getServiceDetails();
+                setModalType(null);
+            }
+        } catch (error) {
+            console.error('Error adding service:', error);
+        }
+    };
 
+    // Function to fetch service details
+    const getServiceDetails = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get('http://localhost:6060/getservice', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                setSerData(response.data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        }
+    };
+
+    // Function to update a service
     const editService = async (e) => {
-        e.preventDefault()
-        const token = localStorage.getItem('token')
-        const servss = await axios.put(`http://localhost:6060/updservice/${editsr.id}`, editsr, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.put(`http://localhost:6060/updservice/${editsr.id}`, editsr, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                alert('Service updated successfully');
+                getServiceDetails();
+                setModalType(null);
             }
-        })
-        if (servss.status === 200) {
-            alert("Updated successfull")
-            getServiceDetails()
-            setModal(false)
+        } catch (error) {
+            console.error('Error updating service:', error);
         }
+    };
 
-    }
-
-
-    const deleteService = async (serDatas) => {
-        const token = localStorage.getItem('token')
-        const serv = await axios.delete(`http://localhost:6060/deleteservice/${serDatas}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+    // Function to delete a service
+    const deleteService = async (serviceId) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.delete(`http://localhost:6060/deleteservice/${serviceId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                alert('Service deleted successfully');
+                getServiceDetails();
             }
-        })
-        if (serv.status === 200) {
-            alert("delete successfull")
-            getServiceDetails()
+        } catch (error) {
+            console.error('Error deleting service:', error);
         }
-    }
+    };
+
+    // Function to open the edit modal and set service data
+    const serviceUpdate = (service) => {
+        setEditService({
+            id: service.id,
+            serviceName: service.serviceName,
+            minPrice: service.minPrice,
+            maxPrice: service.maxPrice,
+            serviceDescription: service.serviceDescription,
+            aboutuserDescription: service.aboutuserDescription,
+            diffServices: service.diffServices,
+            qualification: service.qualification
+        });
+        setModalType('edit');
+    };
+
     useEffect(() => {
-        getServiceDetails()
-    }, [])
+        getServiceDetails();
+    }, []);
+
     return (
         <>
-            <div>
-                <form onSubmit={addServiceFunction}>
-                    <input type="text" placeholder='Enter serviceNAme' name='serviceName' value={addService.serviceName} onChange={onChangeHandler} /><br />
-                    <input type="number" placeholder='Enter minPrice' name='minPrice' onChange={onChangeHandler} value={addService.minPrice} /><br />
-                    <input type="number" placeholder='Enter maxPrice' name='maxPrice' onChange={onChangeHandler} value={addService.maxPrice} /><br />
-                    <input type="text" placeholder='Enter serviceDescription' name='serviceDescription' onChange={onChangeHandler} value={addService.serviceDescription} /><br />
-                    <input type="text" placeholder='Enter aboutuserDescription' name='aboutuserDescription' onChange={onChangeHandler} value={addService.aboutuserDescription} /><br />
-                    <input type="text" placeholder='Enter diffServices' name='diffServices' onChange={onChangeHandler} value={addService.diffServices} /><br />
-                    <input type="text" placeholder='Enter qualification' name='qualification' onChange={onChangeHandler} value={addService.qualification} /><br />
-                    <button>Submit</button>
-                </form>
-            </div>
-            <div>
-                <h1>Services</h1>
-                &nbsp;
-                {/* {serData.length > 0 ? (
-                    
-                        <ul key={service.id}>
-                            <li><p>ServiceName: {service.serviceName}</p></li>
-                            <li><p>minPrice: {service.minPrice}</p></li>
-                            <li><p>maxPrice: {service.maxPrice}</p></li>
-                            <li><p>serviceDescription: {service.serviceDescription}</p></li>
-                            <li><p>aboutuserDescription: {service.aboutuserDescription}</p></li>
-                            <li><p>diffServices: {service.diffServices}</p></li>
-                            <li><p>qualification: {service.qualification}</p></li>
-                            
-                            <hr />
-                        </ul>
-                    ))
-                ) : (
-                    <p>No data</p>
-                )} */}
-            </div>
+            <Button variant="primary" onClick={() => setModalType('add')}>
+                Add Service
+            </Button>
+
+            <Modal show={modalType === 'add'} onHide={() => setModalType(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add Service</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={addServiceFunction}>
+                        <Form.Group controlId="formServiceName">
+                            <Form.Label>Service Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="serviceName"
+                                value={addService.serviceName}
+                                onChange={onChangeHandler}
+                                placeholder="Enter service name"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formMinPrice">
+                            <Form.Label>Min Price</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="minPrice"
+                                value={addService.minPrice}
+                                onChange={onChangeHandler}
+                                placeholder="Enter min price"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formMaxPrice">
+                            <Form.Label>Max Price</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="maxPrice"
+                                value={addService.maxPrice}
+                                onChange={onChangeHandler}
+                                placeholder="Enter max price"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formServiceDescription">
+                            <Form.Label>Service Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="serviceDescription"
+                                value={addService.serviceDescription}
+                                onChange={onChangeHandler}
+                                placeholder="Enter service description"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formAboutUserDescription">
+                            <Form.Label>About User Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="aboutuserDescription"
+                                value={addService.aboutuserDescription}
+                                onChange={onChangeHandler}
+                                placeholder="Enter about user description"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formDiffServices">
+                            <Form.Label>Different Services</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="diffServices"
+                                value={addService.diffServices}
+                                onChange={onChangeHandler}
+                                placeholder="Enter different services"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formQualification">
+                            <Form.Label>Qualification</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="qualification"
+                                value={addService.qualification}
+                                onChange={onChangeHandler}
+                                placeholder="Enter qualification"
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit">
+                            Submit
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={modalType === 'edit'} onHide={() => setModalType(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Service</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={editService}>
+                        <Form.Group controlId="formServiceName">
+                            <Form.Label>Service Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="serviceName"
+                                value={editsr.serviceName}
+                                onChange={editOnChange}
+                                placeholder="Enter service name"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formMinPrice">
+                            <Form.Label>Min Price</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="minPrice"
+                                value={editsr.minPrice}
+                                onChange={editOnChange}
+                                placeholder="Enter min price"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formMaxPrice">
+                            <Form.Label>Max Price</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="maxPrice"
+                                value={editsr.maxPrice}
+                                onChange={editOnChange}
+                                placeholder="Enter max price"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formServiceDescription">
+                            <Form.Label>Service Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="serviceDescription"
+                                value={editsr.serviceDescription}
+                                onChange={editOnChange}
+                                placeholder="Enter service description"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formAboutUserDescription">
+                            <Form.Label>About User Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="aboutuserDescription"
+                                value={editsr.aboutuserDescription}
+                                onChange={editOnChange}
+                                placeholder="Enter about user description"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formDiffServices">
+                            <Form.Label>Different Services</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="diffServices"
+                                value={editsr.diffServices}
+                                onChange={editOnChange}
+                                placeholder="Enter different services"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formQualification">
+                            <Form.Label>Qualification</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="qualification"
+                                value={editsr.qualification}
+                                onChange={editOnChange}
+                                placeholder="Enter qualification"
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit">
+                            Update
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
             <table>
                 <thead>
                     <tr>
                         <th>ServiceName</th>
                         <th>Min Price</th>
-                        <th>Max price</th>
-                        <th>serviceDescription</th>
-                        <th>aboutuserDescription</th>
-                        <th>diffServices</th>
-                        <th>qualification</th>
+                        <th>Max Price</th>
+                        <th>Service Description</th>
+                        <th>About User Description</th>
+                        <th>Different Services</th>
+                        <th>Qualification</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     {serData.map((service) => (
-                    <tr key={service.id}>
-                        <td>{service.serviceName}</td>
-                        <td> {service.minPrice}</td>
-                        <td>{service.maxPrice}</td>
-                        <td> {service.serviceDescription}</td>
-                        <td>{service.aboutuserDescription}</td>
-                        <td> {service.diffServices}</td>
-                        <td> {service.qualification}</td>
-                        <td><button onClick={() => serviceUpdate(service)}>Edit</button></td>
-                        <button onClick={() => deleteService(service.id)}>Delete</button>
-                        <td></td>
-                    </tr>
+                        <tr key={service.id}>
+                            <td>{service.serviceName}</td>
+                            <td>{service.minPrice}</td>
+                            <td>{service.maxPrice}</td>
+                            <td>{service.serviceDescription}</td>
+                            <td>{service.aboutuserDescription}</td>
+                            <td>{service.diffServices}</td>
+                            <td>{service.qualification}</td>
+                            <td><Button variant="warning" onClick={() => serviceUpdate(service)}>Edit</Button></td>
+                            <td><Button variant="danger" onClick={() => deleteService(service.id)}>Delete</Button></td>
+                        </tr>
                     ))}
                 </tbody>
             </table>
-            {modal && (
-                <div>
-                    <form onSubmit={editService}>
-                        <input type="text" placeholder='Enter serviceNAme' name='serviceName' value={editsr.serviceName} onChange={editonChange} /><br />
-                        <input type="number" placeholder='Enter minPrice' name='minPrice' value={editsr.minPrice} onChange={editonChange} /><br />
-                        <input type="number" placeholder='Enter maxPrice' name='maxPrice' value={editsr.maxPrice} onChange={editonChange} /><br />
-                        <input type="text" placeholder='Enter serviceDescription' name='serviceDescription' value={editsr.serviceDescription} onChange={editonChange} /><br />
-                        <input type="text" placeholder='Enter aboutuserDescription' name='aboutuserDescription' value={editsr.aboutuserDescription} onChange={editonChange} /><br />
-                        <input type="text" placeholder='Enter diffServices' name='diffServices' value={editsr.diffServices} onChange={editonChange} /><br />
-                        <input type="text" placeholder='Enter qualification' name='qualification' value={editsr.qualification} onChange={editonChange} /><br />
-                        <button>Update</button>
-                    </form>
-                </div>
-            )}
         </>
-    )
+    );
 }
 
-export default Servicepage
+export default Servicepage;
