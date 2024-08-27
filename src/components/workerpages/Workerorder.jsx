@@ -5,7 +5,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 function Workerorder() {
   const [data, setData] = useState([]);
   const [userd, setUserd] = useState([]);
-  const [modalType, setModalType] = useState(null); // 'edit' or 'chat'
+  const [modalType, setModalType] = useState(null);
   const [mesData, setMesData] = useState({
     orderuser_id: '',
     service_id: '',
@@ -48,7 +48,7 @@ function Workerorder() {
       if (orderUpdate) {
         alert('Updated successfully');
         getData();
-        setModalType(null); // Close the modal
+        setModalType(null);
       }
     } catch (error) {
       console.error('Error updating order:', error);
@@ -68,9 +68,8 @@ function Workerorder() {
         }
       });
       if (resp.status === 200) {
-        alert('Message sent successfully');
         setMessageModal('');
-        fetchMessages(); // Refresh messages
+        fetchMessages();
       }
     } catch (error) {
       alert('Failed to send message');
@@ -153,7 +152,6 @@ function Workerorder() {
           </tbody>
         </table>
 
-        {/* Edit Order Modal */}
         <Modal show={modalType === 'edit'} onHide={() => setModalType(null)}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Order</Modal.Title>

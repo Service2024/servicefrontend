@@ -68,6 +68,11 @@ function UserOrder() {
       });
       if (response.status === 200) {
         setMessages(response.data.data);
+        const userMap = response.data.User.reduce((acc, user) => {
+          acc[user.id] = user.firstname;
+          return acc;
+        }, {});
+        setUserMap(userMap);
       }
     } catch (err) {
       setError('Failed to fetch messages.');
@@ -108,7 +113,6 @@ function UserOrder() {
         },
       });
       if (response.status === 200) {
-        alert("Message sent successfully");
         setNormalMessage('');
         fetchMessages();
       }
