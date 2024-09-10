@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Card } from 'react-bootstrap';
 
 function Workerorder() {
   const [data, setData] = useState([]);
   const [userd, setUserd] = useState([]);
+  const [address, setAddress] = useState([]);
   const [modalType, setModalType] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [mesData, setMesData] = useState({
     orderuser_id: '',
     service_id: '',
@@ -15,7 +17,6 @@ function Workerorder() {
   const [messages, setMessages] = useState([]);
   const [messageModal, setMessageModal] = useState('');
   const [orderId, setOrderId] = useState('');
-  const [useDatekis, setUseDatekis] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,6 +31,7 @@ function Workerorder() {
       if (response.status === 200) {
         setData(response.data.orders);
         setUserd(response.data.userDetailsForRequest);
+        setAddress(response.data.address);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -87,11 +89,6 @@ function Workerorder() {
       });
       if (response.status === 200) {
         setMessages(response.data.data);
-        const userMap = response.data.User.reduce((acc, user) => {
-          acc[user.id] = user.firstname;
-          return acc;
-        }, {});
-        setUseDatekis(userMap);
       }
     } catch (err) {
       setError('Failed to fetch messages.');
@@ -123,35 +120,73 @@ function Workerorder() {
     setModalType('chat');
   };
 
+  
+  const handleViewModalShow = (order) => {
+    const user = userd.find(u => u.id === order.orderuser_id);
+    const addr = address.find(a => a.user_id === order.orderuser_id);
+    setSelectedOrder({ ...order, user, address: addr });
+    setModalType('view');
+  };
+
   return (
     <>
       <div>
         <h1>Work Orders</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Message</th>
-              <th>Created At</th>
-              <th>Updated At</th>
-              <th>Edit</th>
-              <th>Chat</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((order) => (
-              <tr key={order.id}>
-                <td>{order.status === 0 ? 'Pending' : order.status === 1 ? 'Success' : order.status === 2 ? 'Cancel' : 'Unknown'}</td>
-                <td>{order.servicemessage}</td>
-                <td>{new Date(order.createdAt).toLocaleString()}</td>
-                <td>{new Date(order.updatedAt).toLocaleString()}</td>
-                <td><Button onClick={() => handleEditModalShow(order)}>Edit</Button></td>
-                <td><Button onClick={() => handleChatModalShow(order)}>Chat</Button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="row">
+          {data.map((order) => (
+            <div key={order.id} className="col-md-4 mb-3">
+              <Card>
+                <Card.Body>
+                  <Card.Title>Order ID: {order.id}</Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">Status: 
+                    <span style={{
+                      color: order.status === 0 ? 'blue' :
+                             order.status === 1 ? 'green' :
+                             order.status === 2 ? 'red' :
+                             order.status === 3 ? 'pink' :
+                             'black', fontWeight: 'bold'
+                    }}>
+                      {order.status === 0 ? 'Pending' : order.status === 1 ? 'Accepted' : order.status === 2 ? 'Cancelled' : order.status === 3 ? 'Completed' : 'Unknown'}
+                    </span>
+                  </Card.Subtitle>
+                  <Card.Text>
+                    Created At: {new Date(order.createdAt).toLocaleString()}
+                  </Card.Text>
+                  <Button variant="primary" onClick={() => handleViewModalShow(order)}>View</Button>
+                  <Button variant="secondary" onClick={() => handleEditModalShow(order)} className="ml-2">Edit</Button>
+                  <Button variant="info" onClick={() => handleChatModalShow(order)} className="ml-2">Chat</Button>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+        </div>
 
+        {/* View Modal */}
+        <Modal show={modalType === 'view'} onHide={() => setModalType(null)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Order Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {selectedOrder && (
+              <>
+                <h5>User Details</h5>
+                <p><strong>Name:</strong> {selectedOrder.user ? `${selectedOrder.user.firstname} ${selectedOrder.user.lastname}` : 'N/A'}</p>
+                <p><strong>Email:</strong> {selectedOrder.user ? selectedOrder.user.email : 'N/A'}</p>
+                <p><strong>Phone:</strong> {selectedOrder.user ? selectedOrder.user.phonenumber : 'N/A'}</p>
+                <h5>Address</h5>
+                <p><strong>Address:</strong> {selectedOrder.address ? selectedOrder.address.address : 'N/A'}</p>
+                <p><strong>City:</strong> {selectedOrder.address ? selectedOrder.address.city : 'N/A'}</p>
+                <p><strong>State:</strong> {selectedOrder.address ? selectedOrder.address.state : 'N/A'}</p>
+                <p><strong>Postal Code:</strong> {selectedOrder.address ? selectedOrder.address.postal_code : 'N/A'}</p>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setModalType(null)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Edit Modal */}
         <Modal show={modalType === 'edit'} onHide={() => setModalType(null)}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Order</Modal.Title>
@@ -161,14 +196,10 @@ function Workerorder() {
               <Form.Group controlId="formOrderStatus">
                 <Form.Label>Status</Form.Label>
                 <Form.Control as="select" name="status" value={mesData.status} onChange={(e) => setMesData({ ...mesData, [e.target.name]: e.target.value })}>
-                  <option value="0">Pending</option>
-                  <option value="1">Success</option>
-                  <option value="2">Cancel</option>
+                  <option value="1">Accepted</option>
+                  <option value="2">Cancelled</option>
+                  <option value="3">Completed</option>
                 </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="formServiceMessage">
-                <Form.Label>Service Message</Form.Label>
-                <Form.Control type="text" name="servicemessage" value={mesData.servicemessage} onChange={(e) => setMesData({ ...mesData, [e.target.name]: e.target.value })} />
               </Form.Group>
               <Button variant="primary" type="submit">Update</Button>
             </Form>
@@ -197,7 +228,7 @@ function Workerorder() {
                               alt="User Avatar"
                             />
                             <div className="media-body">
-                              <h6 className="mt-0 mb-1"><strong>{useDatekis[message.userID] || "Unknown"}</strong>: {message.message}</h6>
+                              <h6 className="mt-0 mb-1"><strong>{message.userID}:</strong> {message.message}</h6>
                               <small className="text-muted">{new Date(message.createdAt).toLocaleString()}</small>
                             </div>
                           </li>

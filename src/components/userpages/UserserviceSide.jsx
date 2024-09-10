@@ -76,8 +76,6 @@ function UserserviceSide() {
 
   useEffect(() => {
     getServiceData();
-    const intervalId = setInterval(getServiceData, 10000); // Fetch data every 10 seconds
-    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -88,7 +86,6 @@ function UserserviceSide() {
     <div className="container mt-5">
       <h1 className="mb-4">Services</h1>
 
-      {/* Filter Form */}
       <div className="mb-4 border p-4 rounded">
         <h4 className="mb-3">Filter Services</h4>
         <div className="row mb-3">
@@ -137,6 +134,7 @@ function UserserviceSide() {
             <div className="col-md-4 mb-4" key={service.id}>
               <div className="card">
                 <div className="card-body">
+                  {/* <img src="" alt="image" width="100%"/> */}
                   <h5 className="card-title">{service.serviceName}</h5>
                   <p className="card-text">
                     <strong>Minimum Price:</strong> ${service.minPrice}<br />

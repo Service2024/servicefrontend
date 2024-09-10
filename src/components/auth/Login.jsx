@@ -43,9 +43,17 @@ export default function Login() {
             <section className="formConcepts">
                 <div className="formBox">
                     <form onSubmit={handleSubmit}>
-                        {loading && <p style={{ backgroundColor: 'black', color: 'white', fontWeight: 'bold' }}>Loading...</p>}
-                        {successMessage && <p style={{ backgroundColor: 'black', color: 'green', fontWeight: 'bold' }}>{successMessage}</p>}
-                        {error && <p style={{ backgroundColor: 'black', color: 'red', fontWeight: 'bold' }}>{error}</p>}
+                        {loading && (
+                            <div className="loading-container">
+                                <p style={{ backgroundColor: 'black', color: 'white', fontWeight: 'bold' }}>Loading...</p>
+                            </div>
+                        )}
+                        {successMessage && (
+                            <p style={{ backgroundColor: 'black', color: 'green', fontWeight: 'bold' }}>{successMessage}</p>
+                        )}
+                        {error && (
+                            <p style={{ backgroundColor: 'black', color: 'red', fontWeight: 'bold' }}>{error}</p>
+                        )}
                         <h1>Login</h1>
                         <div className="inputDetails">
                             <input
@@ -68,9 +76,19 @@ export default function Login() {
                             <label htmlFor="password">Enter Password</label>
                         </div>
                         <div className="Signupbtns">
-                            <button className="srvcbtn" type="submit" disabled={loading}>
-                                Login
-                            </button>
+                            {!loading && (
+                                <button
+                                    className="srvcbtn"
+                                    type="submit"
+                                >
+                                    Login
+                                </button>
+                            )}
+                            {loading && (
+                                <div className="spinner">
+                                    <p>Loading...</p>
+                                </div>
+                            )}
                         </div>
                         <div className="otherlinks">
                             <span>Forgot password?&nbsp;&nbsp;<a href="/forgotpassword">Forgot password?</a></span><br />

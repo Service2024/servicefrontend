@@ -111,6 +111,39 @@ table {
   border-color: #004085;
 }
 
-  
+.status-cell {
+  font-weight: bold;
+}
+
+.status-cell.pending {
+  color: blue;
+}
+
+.status-cell.success {
+  color: green;
+}
+
+.status-cell.cancelled {
+  color: red;
+}
+
+.status-cell.completed {
+  color: rgb(137, 22, 41);
+}
+
+.table th, .table td {
+  text-align: center;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.card {
+  margin-bottom: 1rem;
+}
+
+
+
 
   

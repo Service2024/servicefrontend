@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import { Modal, Button, Form, Card, Row, Col } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Servicepage() {
     const [addService, setAddService] = useState({
@@ -15,7 +15,7 @@ function Servicepage() {
     });
 
     const [serData, setSerData] = useState([]);
-    const [modalType, setModalType] = useState(null); // 'add' or 'edit'
+    const [modalType, setModalType] = useState(null);
     const [editsr, setEditService] = useState({
         id: '',
         serviceName: '',
@@ -27,7 +27,6 @@ function Servicepage() {
         qualification: ''
     });
 
-    // Function to handle input changes for add and edit forms
     const onChangeHandler = (e) => {
         const { name, value } = e.target;
         setAddService(prevState => ({ ...prevState, [name]: value }));
@@ -38,7 +37,6 @@ function Servicepage() {
         setEditService(prevState => ({ ...prevState, [name]: value }));
     };
 
-    // Function to add a service
     const addServiceFunction = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -56,7 +54,6 @@ function Servicepage() {
         }
     };
 
-    // Function to fetch service details
     const getServiceDetails = async () => {
         const token = localStorage.getItem('token');
         try {
@@ -71,7 +68,6 @@ function Servicepage() {
         }
     };
 
-    // Function to update a service
     const editService = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -89,7 +85,6 @@ function Servicepage() {
         }
     };
 
-    // Function to delete a service
     const deleteService = async (serviceId) => {
         const token = localStorage.getItem('token');
         try {
@@ -105,7 +100,6 @@ function Servicepage() {
         }
     };
 
-    // Function to open the edit modal and set service data
     const serviceUpdate = (service) => {
         setEditService({
             id: service.id,
@@ -126,86 +120,29 @@ function Servicepage() {
 
     return (
         <>
-            <Button variant="primary" onClick={() => setModalType('add')}>
+            <Button variant="primary" onClick={() => setModalType('add')} className="mb-3">
                 Add Service
             </Button>
 
-            <Modal show={modalType === 'add'} onHide={() => setModalType(null)}>
+            {/* Add Service Modal */}
+            <Modal show={modalType === 'add'} onHide={() => setModalType(null)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Add Service</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={addServiceFunction}>
-                        <Form.Group controlId="formServiceName">
-                            <Form.Label>Service Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="serviceName"
-                                value={addService.serviceName}
-                                onChange={onChangeHandler}
-                                placeholder="Enter service name"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formMinPrice">
-                            <Form.Label>Min Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="minPrice"
-                                value={addService.minPrice}
-                                onChange={onChangeHandler}
-                                placeholder="Enter min price"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formMaxPrice">
-                            <Form.Label>Max Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="maxPrice"
-                                value={addService.maxPrice}
-                                onChange={onChangeHandler}
-                                placeholder="Enter max price"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formServiceDescription">
-                            <Form.Label>Service Description</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="serviceDescription"
-                                value={addService.serviceDescription}
-                                onChange={onChangeHandler}
-                                placeholder="Enter service description"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAboutUserDescription">
-                            <Form.Label>About User Description</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="aboutuserDescription"
-                                value={addService.aboutuserDescription}
-                                onChange={onChangeHandler}
-                                placeholder="Enter about user description"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formDiffServices">
-                            <Form.Label>Different Services</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="diffServices"
-                                value={addService.diffServices}
-                                onChange={onChangeHandler}
-                                placeholder="Enter different services"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formQualification">
-                            <Form.Label>Qualification</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="qualification"
-                                value={addService.qualification}
-                                onChange={onChangeHandler}
-                                placeholder="Enter qualification"
-                            />
-                        </Form.Group>
+                        {Object.keys(addService).map((key) => (
+                            <Form.Group key={key} controlId={`form${key}`}>
+                                <Form.Label>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</Form.Label>
+                                <Form.Control
+                                    type={key.includes('Price') ? 'number' : 'text'}
+                                    name={key}
+                                    value={addService[key]}
+                                    onChange={onChangeHandler}
+                                    placeholder={`Enter ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                                />
+                            </Form.Group>
+                        ))}
                         <Button variant="primary" type="submit">
                             Submit
                         </Button>
@@ -213,82 +150,25 @@ function Servicepage() {
                 </Modal.Body>
             </Modal>
 
-            <Modal show={modalType === 'edit'} onHide={() => setModalType(null)}>
+            {/* Edit Service Modal */}
+            <Modal show={modalType === 'edit'} onHide={() => setModalType(null)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Service</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={editService}>
-                        <Form.Group controlId="formServiceName">
-                            <Form.Label>Service Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="serviceName"
-                                value={editsr.serviceName}
-                                onChange={editOnChange}
-                                placeholder="Enter service name"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formMinPrice">
-                            <Form.Label>Min Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="minPrice"
-                                value={editsr.minPrice}
-                                onChange={editOnChange}
-                                placeholder="Enter min price"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formMaxPrice">
-                            <Form.Label>Max Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="maxPrice"
-                                value={editsr.maxPrice}
-                                onChange={editOnChange}
-                                placeholder="Enter max price"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formServiceDescription">
-                            <Form.Label>Service Description</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="serviceDescription"
-                                value={editsr.serviceDescription}
-                                onChange={editOnChange}
-                                placeholder="Enter service description"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formAboutUserDescription">
-                            <Form.Label>About User Description</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="aboutuserDescription"
-                                value={editsr.aboutuserDescription}
-                                onChange={editOnChange}
-                                placeholder="Enter about user description"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formDiffServices">
-                            <Form.Label>Different Services</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="diffServices"
-                                value={editsr.diffServices}
-                                onChange={editOnChange}
-                                placeholder="Enter different services"
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formQualification">
-                            <Form.Label>Qualification</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="qualification"
-                                value={editsr.qualification}
-                                onChange={editOnChange}
-                                placeholder="Enter qualification"
-                            />
-                        </Form.Group>
+                        {Object.keys(editsr).map((key) => (
+                            <Form.Group key={key} controlId={`form${key}`}>
+                                <Form.Label>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</Form.Label>
+                                <Form.Control
+                                    type={key.includes('Price') ? 'number' : 'text'}
+                                    name={key}
+                                    value={editsr[key]}
+                                    onChange={editOnChange}
+                                    placeholder={`Enter ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                                />
+                            </Form.Group>
+                        ))}
                         <Button variant="primary" type="submit">
                             Update
                         </Button>
@@ -296,36 +176,36 @@ function Servicepage() {
                 </Modal.Body>
             </Modal>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ServiceName</th>
-                        <th>Min Price</th>
-                        <th>Max Price</th>
-                        <th>Service Description</th>
-                        <th>About User Description</th>
-                        <th>Different Services</th>
-                        <th>Qualification</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {serData.map((service) => (
-                        <tr key={service.id}>
-                            <td>{service.serviceName}</td>
-                            <td>{service.minPrice}</td>
-                            <td>{service.maxPrice}</td>
-                            <td>{service.serviceDescription}</td>
-                            <td>{service.aboutuserDescription}</td>
-                            <td>{service.diffServices}</td>
-                            <td>{service.qualification}</td>
-                            <td><Button variant="warning" onClick={() => serviceUpdate(service)}>Edit</Button></td>
-                            <td><Button variant="danger" onClick={() => deleteService(service.id)}>Delete</Button></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Service Cards */}
+            <Row>
+                {serData.map((service) => (
+                    <Col md={4} lg={3} key={service.id} className="mb-3">
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>{service.serviceName}</Card.Title>
+                                <Card.Subtitle className="mb-2 text-muted">
+                                    ${service.minPrice} - ${service.maxPrice}
+                                </Card.Subtitle>
+                                <Card.Text>
+                                    <strong>Description:</strong> {service.serviceDescription}
+                                    <br />
+                                    <strong>About User:</strong> {service.aboutuserDescription}
+                                    <br />
+                                    <strong>Different Services:</strong> {service.diffServices}
+                                    <br />
+                                    <strong>Qualification:</strong> {service.qualification}
+                                </Card.Text>
+                                <Button variant="warning" onClick={() => serviceUpdate(service)} className="me-2">
+                                    Edit
+                                </Button>
+                                <Button variant="danger" onClick={() => deleteService(service.id)}>
+                                    Delete
+                                </Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
         </>
     );
 }

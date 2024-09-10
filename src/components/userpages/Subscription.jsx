@@ -135,11 +135,11 @@ function Subscription() {
               required
             >
               <option value="">Select Year</option>
-{Array.from({ length: 51 }, (_, i) => 2000 + i).map((year) => (
-  <option key={year} value={year}>
-    {year}
-  </option>
-))}
+              {Array.from({ length: 51 }, (_, i) => 2000 + i).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
 
             </select>
           </div>

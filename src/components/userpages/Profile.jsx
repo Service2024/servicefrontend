@@ -2,6 +2,72 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Full list of U.S. states
+const statesList = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+  "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", 
+  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", 
+  "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", 
+  "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", 
+  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
+  "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+];
+
+// Example list of cities for each state
+const citiesList = {
+  "Alabama": ["Birmingham", "Montgomery", "Mobile", "Huntsville", "Tuscaloosa"],
+  "Alaska": ["Anchorage", "Juneau", "Fairbanks", "Sitka", "Ketchikan"],
+  "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler", "Scottsdale"],
+  "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville", "Jonesboro", "North Little Rock"],
+  "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose", "Sacramento"],
+  "Colorado": ["Denver", "Colorado Springs", "Aurora", "Fort Collins", "Lakewood"],
+  "Connecticut": ["Hartford", "New Haven", "Stamford", "Bridgeport", "Norwalk"],
+  "Delaware": ["Wilmington", "Dover", "Newark", "Middletown", "Georgetown"],
+  "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville", "St. Petersburg"],
+  "Georgia": ["Atlanta", "Augusta", "Columbus", "Macon", "Savannah"],
+  "Hawaii": ["Honolulu", "Hilo", "Kailua", "Kapolei", "Waipahu"],
+  "Idaho": ["Boise", "Nampa", "Meridian", "Idaho Falls", "Pocatello"],
+  "Illinois": ["Chicago", "Aurora", "Naperville", "Joliet", "Springfield"],
+  "Indiana": ["Indianapolis", "Fort Wayne", "Evansville", "South Bend", "Carmel"],
+  "Iowa": ["Des Moines", "Cedar Rapids", "Davenport", "Sioux City", "Iowa City"],
+  "Kansas": ["Wichita", "Overland Park", "Kansas City", "Olathe", "Topeka"],
+  "Kentucky": ["Louisville", "Lexington", "Bowling Green", "Owensboro", "Covington"],
+  "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport", "Lafayette", "Lake Charles"],
+  "Maine": ["Portland", "Lewiston", "Bangor", "Augusta", "Biddeford"],
+  "Maryland": ["Baltimore", "Rockville", "Gaithersburg", "Bowie", "Frederick"],
+  "Massachusetts": ["Boston", "Worcester","Westford","Springfield", "Cambridge", "Lowell"],
+  "Michigan": ["Detroit", "Grand Rapids", "Warren", "Sterling Heights", "Ann Arbor"],
+  "Minnesota": ["Minneapolis", "Saint Paul", "Rochester", "Duluth", "Bloomington"],
+  "Mississippi": ["Jackson", "Gulfport", "Biloxi", "Southaven", "Hattiesburg"],
+  "Missouri": ["Kansas City", "St. Louis", "Springfield", "Columbia", "Jefferson City"],
+  "Montana": ["Billings", "Missoula", "Great Falls", "Bozeman", "Butte"],
+  "Nebraska": ["Omaha", "Lincoln", "Bellevue", "Grand Island", "Kearney"],
+  "Nevada": ["Las Vegas", "Reno", "Henderson", "Paradise", "Carson City"],
+  "New Hampshire": ["Manchester", "Nashua", "Concord", "Derry", "Rochester"],
+  "New Jersey": ["Newark", "Jersey City", "Paterson", "Elizabeth", "Edison"],
+  "New Mexico": ["Albuquerque", "Santa Fe", "Las Cruces", "Rio Rancho", "Roswell"],
+  "New York": ["New York City", "Buffalo", "Rochester", "Syracuse", "Albany"],
+  "North Carolina": ["Charlotte", "Raleigh", "Greensboro", "Durham", "Winston-Salem"],
+  "North Dakota": ["Fargo", "Bismarck", "Grand Forks", "Minot", "West Fargo"],
+  "Ohio": ["Columbus", "Cleveland", "Cincinnati", "Toledo", "Akron"],
+  "Oklahoma": ["Oklahoma City", "Tulsa", "Norman", "Edmond", "Lawton"],
+  "Oregon": ["Portland", "Salem", "Eugene", "Gresham", "Bend"],
+  "Pennsylvania": ["Philadelphia", "Pittsburgh", "Allentown", "Erie", "Reading"],
+  "Rhode Island": ["Providence", "Cranston", "Warwick", "Pawtucket", "East Providence"],
+  "South Carolina": ["Charleston", "Columbia", "Greenville", "Myrtle Beach", "Spartanburg"],
+  "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen", "Brookings", "Mitchell"],
+  "Tennessee": ["Memphis", "Nashville", "Knoxville", "Chattanooga", "Clarksville"],
+  "Texas": ["Houston", "San Antonio", "Dallas", "Austin", "Fort Worth"],
+  "Utah": ["Salt Lake City", "West Valley City", "Provo", "West Jordan", "Orem"],
+  "Vermont": ["Burlington", "South Burlington", "Rutland", "Barre", "Montpelier"],
+  "Virginia": ["Virginia Beach", "Norfolk", "Chesapeake", "Richmond", "Newport News"],
+  "Washington": ["Seattle", "Spokane", "Tacoma", "Vancouver", "Bellevue"],
+  "West Virginia": ["Charleston", "Huntington", "Morgantown", "Parkersburg", "Wheeling"],
+  "Wisconsin": ["Milwaukee", "Madison", "Green Bay", "Kenosha", "Racine"],
+  "Wyoming": ["Cheyenne", "Casper", "Laramie", "Gillette", "Jackson"]
+};
+
 function Profile() {
   const [data, setData] = useState({});
   const [modal, setModal] = useState(false);
@@ -18,15 +84,17 @@ function Profile() {
     state: '',
     postal_code: ''
   });
-  const [getAddress, setGetAddress] = useState([]);
   const [editData, setEditData] = useState({
     address: '',
     city: '',
     state: '',
     postal_code: ''
   });
+  const [getAddress, setGetAddress] = useState([]);
   const [file, setFile] = useState(null);
   const [images, setImages] = useState([]);
+  const [selectedState, setSelectedState] = useState('');
+  const [citiesOptions, setCitiesOptions] = useState([]);
 
   useEffect(() => {
     getProfile();
@@ -41,8 +109,6 @@ function Profile() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(response.data.message);
-      // Debugging: Check if data is fetched correctly
-      console.log('Profile data:', response.data.message);
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -58,7 +124,7 @@ function Profile() {
       if (updProfile.status === 200) {
         alert('Profile updated');
         setPromodal(false);
-        getProfile(); // Refresh profile data
+        getProfile();
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -164,7 +230,6 @@ function Profile() {
   };
 
   const editProfileData = (profileData) => {
-    // Open modal and set form values for editing
     setProupdate({
       firstname: profileData.firstname || '',
       lastname: profileData.lastname || '',
@@ -172,6 +237,14 @@ function Profile() {
       phonenumber: profileData.phonenumber || ''
     });
     setPromodal(true);
+  };
+
+  const handleStateChange = (e) => {
+    const state = e.target.value;
+    setSelectedState(state);
+    setCitiesOptions(citiesList[state] || []);
+    setAddData({ ...addData, state });
+    setEditData({ ...editData, state });
   };
 
   return (
@@ -238,28 +311,34 @@ function Profile() {
                   />
                 </div>
                 <div className="mb-3">
-                  <input
-                    type="text"
+                  <select
                     className="form-control"
-                    placeholder="Enter city"
+                    name="state"
+                    value={addData.state}
+                    onChange={handleStateChange}
+                  >
+                    <option value="">Select State</option>
+                    {statesList.map((state) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <select
+                    className="form-control"
                     name="city"
                     value={addData.city}
                     onChange={(e) => setAddData({ ...addData, city: e.target.value })}
-                  />
+                  >
+                    <option value="">Select City</option>
+                    {citiesOptions.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="mb-3">
                   <input
                     type="text"
-                    className="form-control"
-                    placeholder="Enter state"
-                    name="state"
-                    value={addData.state}
-                    onChange={(e) => setAddData({ ...addData, state: e.target.value })}
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="number"
                     className="form-control"
                     placeholder="Enter postal code"
                     name="postal_code"
@@ -293,7 +372,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
       {promodal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <div className="modal-dialog">
@@ -308,43 +386,39 @@ function Profile() {
                     <input
                       type="text"
                       className="form-control"
-                      name="firstname"
+                      placeholder="First Name"
                       value={proupdate.firstname}
                       onChange={(e) => setProupdate({ ...proupdate, firstname: e.target.value })}
-                      placeholder="First Name"
                     />
                   </div>
                   <div className="mb-3">
                     <input
                       type="text"
                       className="form-control"
-                      name="lastname"
+                      placeholder="Last Name"
                       value={proupdate.lastname}
                       onChange={(e) => setProupdate({ ...proupdate, lastname: e.target.value })}
-                      placeholder="Last Name"
                     />
                   </div>
                   <div className="mb-3">
                     <input
                       type="email"
                       className="form-control"
-                      name="email"
+                      placeholder="Email"
                       value={proupdate.email}
                       onChange={(e) => setProupdate({ ...proupdate, email: e.target.value })}
-                      placeholder="Email"
                     />
                   </div>
                   <div className="mb-3">
                     <input
                       type="text"
                       className="form-control"
-                      name="phonenumber"
+                      placeholder="Phone Number"
                       value={proupdate.phonenumber}
                       onChange={(e) => setProupdate({ ...proupdate, phonenumber: e.target.value })}
-                      placeholder="Phone Number"
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary">Save changes</button>
+                  <button type="submit" className="btn btn-primary">Save Changes</button>
                 </form>
               </div>
             </div>
@@ -352,7 +426,6 @@ function Profile() {
         </div>
       )}
 
-      {/* Edit Address Modal */}
       {modal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <div className="modal-dialog">
@@ -367,43 +440,45 @@ function Profile() {
                     <input
                       type="text"
                       className="form-control"
-                      name="address"
+                      placeholder="Address"
                       value={editData.address}
                       onChange={(e) => setEditData({ ...editData, address: e.target.value })}
-                      placeholder="Address"
                     />
                   </div>
                   <div className="mb-3">
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      name="city"
+                      value={editData.state}
+                      onChange={handleStateChange}
+                    >
+                      <option value="">Select State</option>
+                      {statesList.map((state) => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <select
+                      className="form-control"
                       value={editData.city}
                       onChange={(e) => setEditData({ ...editData, city: e.target.value })}
-                      placeholder="City"
-                    />
+                    >
+                      <option value="">Select City</option>
+                      {citiesOptions.map((city) => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-3">
                     <input
                       type="text"
                       className="form-control"
-                      name="state"
-                      value={editData.state}
-                      onChange={(e) => setEditData({ ...editData, state: e.target.value })}
-                      placeholder="State"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="postal_code"
+                      placeholder="Postal Code"
                       value={editData.postal_code}
                       onChange={(e) => setEditData({ ...editData, postal_code: e.target.value })}
-                      placeholder="Postal Code"
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary">Save changes</button>
+                  <button type="submit" className="btn btn-primary">Save Changes</button>
                 </form>
               </div>
             </div>
